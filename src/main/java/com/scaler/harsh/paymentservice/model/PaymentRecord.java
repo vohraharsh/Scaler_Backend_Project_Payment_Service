@@ -15,4 +15,5 @@ public class PaymentRecord implements Serializable {
     private double amount;
     private String status;
     private String transactionId;
+    private String paymentMethod;
 }

@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
+
 @RestController
 public class PaymentController {
+
+    private static final Set<String> ALLOWED_METHODS = Set.of("CARD", "UPI", "NETBANKING", "WALLET");
 
     private final PaymentService svc;
 
@@ -27,8 +31,17 @@ public class PaymentController {
         if (request.getAmount() <= 0) {
             throw new ServiceException("Amount must be positive", HttpStatus.BAD_REQUEST);
         }
+        if (request.getPaymentMethod() == null
+                || !ALLOWED_METHODS.contains(request.getPaymentMethod().trim().toUpperCase())) {
+            throw new ServiceException(
+                    "Valid paymentMethod is required. Must be one of: CARD, UPI, NETBANKING, WALLET",
+                    HttpStatus.BAD_REQUEST);
+        }
 
         PaymentResponseDTO response = svc.processPayment(request);
+        if ("FAILED".equals(response.getStatus())) {
+            return new ResponseEntity<>(response, HttpStatus.PAYMENT_REQUIRED);
+        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
