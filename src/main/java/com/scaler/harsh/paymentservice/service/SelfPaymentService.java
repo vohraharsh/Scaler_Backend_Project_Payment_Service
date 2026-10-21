@@ -14,16 +14,14 @@ import java.util.UUID;
 @Primary
 public class SelfPaymentService implements PaymentService {
 
-    // Mock gateway only — no real money movement. ~10% organic decline rate so
-    // Order Service's failure-handling path gets exercised in normal use, plus
-    // an explicit simulateFailure override for deterministic testing.
     private static final double ORGANIC_FAILURE_RATE = 0.10;
 
     private final PaymentRecordRepository paymentRecordRepository;
-    private final Random random = new Random();
+    private final Random random;
 
-    public SelfPaymentService(PaymentRecordRepository paymentRecordRepository) {
+    public SelfPaymentService(PaymentRecordRepository paymentRecordRepository, Random random) {
         this.paymentRecordRepository = paymentRecordRepository;
+        this.random = random;
     }
 
     @Override
