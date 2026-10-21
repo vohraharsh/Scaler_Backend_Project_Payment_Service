@@ -38,10 +38,10 @@ public class PaymentController {
                     HttpStatus.BAD_REQUEST);
         }
 
+        // Always 201 — the request to process a payment succeeded; the outcome (SUCCESS/FAILED)
+        // is in the response body's status field, not the HTTP status. A decline is a normal
+        // business outcome here, not an exceptional one.
         PaymentResponseDTO response = svc.processPayment(request);
-        if ("FAILED".equals(response.getStatus())) {
-            return new ResponseEntity<>(response, HttpStatus.PAYMENT_REQUIRED);
-        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
