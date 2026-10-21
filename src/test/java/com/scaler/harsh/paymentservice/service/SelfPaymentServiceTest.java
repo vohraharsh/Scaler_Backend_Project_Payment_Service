@@ -31,7 +31,7 @@ class SelfPaymentServiceTest {
     @BeforeEach
     void setUp() {
         selfPaymentService = new SelfPaymentService(paymentRecordRepository, random);
-        when(paymentRecordRepository.save(any(PaymentRecord.class))).thenAnswer(inv -> {
+            lenient().when(paymentRecordRepository.save(any(PaymentRecord.class))).thenAnswer(inv -> {
             PaymentRecord record = inv.getArgument(0);
             record.setId(1);
             return record;
