@@ -5,4 +5,5 @@ import com.scaler.harsh.paymentservice.dto.PaymentResponseDTO;
 
 public interface PaymentService {
     PaymentResponseDTO processPayment(CreatePaymentRequestDTO request);
+    PaymentResponseDTO getPaymentByOrderId(Integer orderId);
 }

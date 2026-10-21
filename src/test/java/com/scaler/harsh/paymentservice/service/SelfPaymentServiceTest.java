@@ -10,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.scaler.harsh.paymentservice.exceptions.ServiceException;
+import org.springframework.http.HttpStatus;
+import java.util.Optional;
 
 import java.util.Random;
 
@@ -152,4 +155,36 @@ class SelfPaymentServiceTest {
 
         assertEquals("TXN-overridden-by-db", response.getTransactionId());
     }
+
+    // ---------- getPaymentByOrderId ----------
+    @Test
+    void getPaymentByOrderId_found_returnsMappedResponse() {
+        PaymentRecord record = new PaymentRecord();
+        record.setId(5);
+        record.setOrderId(42);
+        record.setUserId(3);
+        record.setAmount(250.75);
+        record.setStatus("SUCCESS");
+        record.setTransactionId("TXN-abc");
+        record.setPaymentMethod("UPI");
+        when(paymentRecordRepository.findByOrderId(42)).thenReturn(Optional.of(record));
+
+        PaymentResponseDTO response = selfPaymentService.getPaymentByOrderId(42);
+
+        assertEquals(42, response.getOrderId());
+        assertEquals("TXN-abc", response.getTransactionId());
+        assertEquals("SUCCESS", response.getStatus());
+        assertEquals("UPI", response.getPaymentMethod());
+        assertEquals(250.75, response.getAmount());
+    }
+
+    @Test
+    void getPaymentByOrderId_notFound_throws404() {
+        when(paymentRecordRepository.findByOrderId(999)).thenReturn(Optional.empty());
+
+        ServiceException ex = assertThrows(ServiceException.class,
+                () -> selfPaymentService.getPaymentByOrderId(999));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
+    }
+
 }

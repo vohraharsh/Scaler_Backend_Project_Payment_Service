@@ -2,11 +2,14 @@ package com.scaler.harsh.paymentservice.service;
 
 import com.scaler.harsh.paymentservice.dto.CreatePaymentRequestDTO;
 import com.scaler.harsh.paymentservice.dto.PaymentResponseDTO;
+import com.scaler.harsh.paymentservice.exceptions.ServiceException;
 import com.scaler.harsh.paymentservice.model.PaymentRecord;
 import com.scaler.harsh.paymentservice.repository.PaymentRecordRepository;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -41,6 +44,19 @@ public class SelfPaymentService implements PaymentService {
 
         record = paymentRecordRepository.save(record);
 
+        return toResponseDTO(record);
+    }
+
+    @Override
+    public PaymentResponseDTO getPaymentByOrderId(Integer orderId) {
+        Optional<PaymentRecord> record = paymentRecordRepository.findByOrderId(orderId);
+        if (record.isEmpty()) {
+            throw new ServiceException("No payment found for order: " + orderId, HttpStatus.NOT_FOUND);
+        }
+        return toResponseDTO(record.get());
+    }
+
+    private PaymentResponseDTO toResponseDTO(PaymentRecord record) {
         PaymentResponseDTO response = new PaymentResponseDTO();
         response.setTransactionId(record.getTransactionId());
         response.setOrderId(record.getOrderId());

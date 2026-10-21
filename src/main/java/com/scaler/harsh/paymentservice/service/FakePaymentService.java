@@ -18,4 +18,9 @@ public class FakePaymentService implements PaymentService {
         response.setStatus("SUCCESS");
         return response;
     }
+
+    @Override
+    public PaymentResponseDTO getPaymentByOrderId(Integer orderId) {
+        throw new UnsupportedOperationException("FakePaymentService does not support receipt lookup");
+    }
 }

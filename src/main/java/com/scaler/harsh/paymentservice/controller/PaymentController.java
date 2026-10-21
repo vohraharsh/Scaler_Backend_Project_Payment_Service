@@ -6,6 +6,8 @@ import com.scaler.harsh.paymentservice.exceptions.ServiceException;
 import com.scaler.harsh.paymentservice.service.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,5 +45,15 @@ public class PaymentController {
         // business outcome here, not an exceptional one.
         PaymentResponseDTO response = svc.processPayment(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // Receipt lookup — lets a client retrieve a payment's outcome after the fact instead of
+    // only ever seeing it in the original POST /payments response (PRD 5.3).
+    @GetMapping("/payments/order/{orderId}")
+    public PaymentResponseDTO getPaymentByOrderId(@PathVariable("orderId") Integer orderId) {
+        if (orderId == null || orderId <= 0) {
+            throw new ServiceException("Invalid orderId", HttpStatus.BAD_REQUEST);
+        }
+        return svc.getPaymentByOrderId(orderId);
     }
 }
