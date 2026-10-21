@@ -49,7 +49,7 @@ public class SelfPaymentService implements PaymentService {
 
     @Override
     public PaymentResponseDTO getPaymentByOrderId(Integer orderId) {
-        Optional<PaymentRecord> record = paymentRecordRepository.findByOrderId(orderId);
+        Optional<PaymentRecord> record = paymentRecordRepository.findFirstByOrderIdOrderByIdDesc(orderId);
         if (record.isEmpty()) {
             throw new ServiceException("No payment found for order: " + orderId, HttpStatus.NOT_FOUND);
         }

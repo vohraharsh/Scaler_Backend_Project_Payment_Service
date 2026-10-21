@@ -34,7 +34,7 @@ class SelfPaymentServiceTest {
     @BeforeEach
     void setUp() {
         selfPaymentService = new SelfPaymentService(paymentRecordRepository, random);
-            lenient().when(paymentRecordRepository.save(any(PaymentRecord.class))).thenAnswer(inv -> {
+        lenient().when(paymentRecordRepository.save(any(PaymentRecord.class))).thenAnswer(inv -> {
             PaymentRecord record = inv.getArgument(0);
             record.setId(1);
             return record;
@@ -167,7 +167,7 @@ class SelfPaymentServiceTest {
         record.setStatus("SUCCESS");
         record.setTransactionId("TXN-abc");
         record.setPaymentMethod("UPI");
-        when(paymentRecordRepository.findByOrderId(42)).thenReturn(Optional.of(record));
+        when(paymentRecordRepository.findFirstByOrderIdOrderByIdDesc(42)).thenReturn(Optional.of(record));
 
         PaymentResponseDTO response = selfPaymentService.getPaymentByOrderId(42);
 
@@ -180,7 +180,7 @@ class SelfPaymentServiceTest {
 
     @Test
     void getPaymentByOrderId_notFound_throws404() {
-        when(paymentRecordRepository.findByOrderId(999)).thenReturn(Optional.empty());
+        when(paymentRecordRepository.findFirstByOrderIdOrderByIdDesc(999)).thenReturn(Optional.empty());
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> selfPaymentService.getPaymentByOrderId(999));
